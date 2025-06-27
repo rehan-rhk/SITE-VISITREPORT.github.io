@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Cement - Premium Field Reporting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2c6e49;
+            --secondary: #4c956c;
+            --accent: #d68c45;
+            --light: #fefee3;
+            --dark: #1d3557;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --glass: rgba(255, 255, 255, 0.25);
+            --shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            --error: #d32f2f;
+            --success: #2e7d32;
+            --construction-yellow: #ffd166;
+            --construction-red: #ef476f;
+            --construction-blue: #118ab2;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a3a, #0d1b2a);
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Animated Background */
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, var(--gold), var(--accent));
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--silver), #bdb2ff);
+            top: 40%;
+            right: 5%;
+            animation-delay: -5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(135deg, #caffbf, #9bf6ff);
+            bottom: 10%;
+            left: 15%;
+            animation-delay: -10s;
+        }
+
+        .shape:nth-child(4) {
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #ffc6ff, #bdb2ff);
+            top: 70%;
+            right: 15%;
+            animation-delay: -7s;
+        }
+
+        .shape:nth-child(5) {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #fdffb6, #ffd6a5);
+            top: 20%;
+            right: 30%;
+            animation-delay: -12s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(20px, 40px) rotate(5deg);
+            }
+            50% {
+                transform: translate(-30px, 60px) rotate(-5deg);
+            }
+            75% {
+                transform: translate(15px, -20px) rotate(3deg);
+            }
+        }
+
+        /* Construction Tools Animation */
+        .construction-tools {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .tool {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            animation: float-tool 25s infinite linear;
+            opacity: 0.7;
+            color: var(--gold);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+        }
+
+        .tool:nth-child(1) {
+            top: 15%;
+            left: 8%;
+            animation-delay: 0s;
+            color: var(--gold);
+        }
+
+        .tool:nth-child(2) {
+            top: 65%;
+            right: 12%;
+            animation-delay: -6s;
+            color: var(--silver);
+        }
+
+        .tool:nth-child(3) {
+            bottom: 15%;
+            left: 20%;
+            animation-delay: -10s;
+            color: var(--accent);
+        }
+
+        .tool:nth-child(4) {
+            top: 35%;
+            right: 25%;
+            animation-delay: -3s;
+            color: var(--gold);
+        }
+
+        .tool:nth-child(5) {
+            top: 25%;
+            right: 8%;
+            animation-delay: -8s;
+            color: var(--silver);
+        }
+
+        .tool:nth-child(6) {
+            top: 75%;
+            left: 25%;
+            animation-delay: -12s;
+            color: var(--accent);
+        }
+
+        .tool:nth-child(7) {
+            top: 45%;
+            left: 15%;
+            animation-delay: -5s;
+            color: var(--gold);
+        }
+
+        @keyframes float-tool {
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+            25% {
+                transform: translate(150px, 80px) rotate(90deg) scale(1.1);
+            }
+            50% {
+                transform: translate(250px, 40px) rotate(180deg) scale(1);
+            }
+            75% {
+                transform: translate(-100px, 120px) rotate(270deg) scale(1.1);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg) scale(1);
+            }
+        }
+
+        /* Tool rotation animations */
+        .tool i {
+            animation: rotate-tool 5s infinite linear;
+        }
+
+        @keyframes rotate-tool {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--gold), var(--accent));
+            color: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            animation: pulse 3s infinite;
+            border: 2px solid var(--silver);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.6);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 20px rgba(255, 215, 0, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--gold), var(--silver));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--silver);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .form-container {
+            background: rgba(20, 30, 48, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 
+                        0 0 0 1px rgba(255, 255, 255, 0.1),
+                        inset 0 0 20px rgba(255, 215, 0, 0.2);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-container:hover {
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), 
+                        0 0 0 1px rgba(255, 255, 255, 0.1),
+                        inset 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 215, 0, 0.05),
+                rgba(255, 215, 0, 0)
+            );
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 2.2rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .form-header p {
+            color: var(--silver);
+            font-size: 1.1rem;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: var(--gold);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group i {
+            color: var(--accent);
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 16px 20px;
+            border: none;
+            background: rgba(10, 15, 25, 0.6);
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+            background: rgba(15, 25, 40, 0.7);
+            border-color: rgba(255, 215, 0, 0.4);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .dynamic-fields {
+            background: rgba(15, 25, 40, 0.5);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dynamic-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .dynamic-col {
+            flex: 1;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--gold), var(--accent));
+            color: #1a2a3a;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(-2px);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.3),
+                rgba(255, 255, 255, 0)
+            );
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--gold), #ff9a00);
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0 20px;
+            color: var(--silver);
+            font-size: 0.9rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a3a, #0d1b2a);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 
+                        0 0 0 1px rgba(255, 215, 0, 0.2),
+                        inset 0 0 20px rgba(255, 215, 0, 0.1);
+            position: relative;
+            animation: slideUp 0.6s ease-out;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--gold);
+            transition: all 0.3s ease;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-modal:hover {
+            color: var(--accent);
+            transform: rotate(90deg);
+        }
+
+        .whatsapp-preview {
+            background: rgba(10, 20, 30, 0.7);
+            border-radius: 12px;
+            padding: 25px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            border-left: 4px solid var(--accent);
+            margin-top: 25px;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: white;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .error-message {
+            color: var(--error);
+            background: rgba(211, 47, 47, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid var(--error);
+            display: none;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .loading-spinner {
+            width: 70px;
+            height: 70px;
+            border: 8px solid rgba(255, 215, 0, 0.2);
+            border-top: 8px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-check {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            animation: scaleIn 0.6s ease-out;
+            box-shadow: 0 0 30px rgba(46, 125, 50, 0.5);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .success-check i {
+            color: white;
+            font-size: 50px;
+            animation: pulseIcon 1.5s infinite;
+        }
+
+        @keyframes pulseIcon {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Address map preview */
+        .map-container {
+            height: 220px;
+            border-radius: 12px;
+            margin-top: 15px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .map-container:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .map-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2c3e50, #1a2a3a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--silver);
+            font-weight: 500;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            z-index: 10;
+            gap: 15px;
+        }
+
+        .map-placeholder i {
+            font-size: 50px;
+            color: var(--gold);
+            animation: pulse 2s infinite;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h3 {
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .modal-header p {
+            color: var(--silver);
+        }
+
+        /* Responsive Design - Mobile Optimized */
+        @media (max-width: 768px) {
+            .form-row, .dynamic-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .logo h1 {
+                font-size: 2.2rem;
+            }
+            
+            .form-container {
+                padding: 25px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .tool {
+                font-size: 24px;
+            }
+
+            .logo-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .logo {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .logo h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .form-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .form-group input, 
+            .form-group select, 
+            .form-group textarea {
+                padding: 14px 16px;
+            }
+
+            .btn {
+                padding: 16px;
+                font-size: 1rem;
+            }
+
+            .map-container {
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated floating shapes for background -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <!-- Construction tools animation -->
+    <div class="construction-tools">
+        <div class="tool"><i class="fas fa-hammer"></i></div>
+        <div class="tool"><i class="fas fa-trowel"></i></div>
+        <div class="tool"><i class="fas fa-ruler-combined"></i></div>
+        <div class="tool"><i class="fas fa-tools"></i></div>
+        <div class="tool"><i class="fas fa-hard-hat"></i></div>
+        <div class="tool"><i class="fas fa-paint-roller"></i></div>
+        <div class="tool"><i class="fas fa-ruler"></i></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h1>RHK UNIQUE</h1>
+            </div>
+            <p class="tagline">RHK UNIQUE Construction Solutions &bull; Excellence in Every Project</p>
+        </header>
+
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Field Visit Report</h2>
+                <p>Complete your site visit details as per the required format</p>
+            </div>
+
+            <form id="reportForm">
+                <div class="form-group">
+                    <label for="whatsappNumber"><i class="fab fa-whatsapp"></i> WhatsApp Number to Send Report</label>
+                    <input type="tel" id="whatsappNumber" placeholder="Enter WhatsApp number with country code" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="visitType"><i class="fas fa-hard-hat"></i> Visit Type</label>
+                    <select id="visitType" required>
+                        <option value="">Select visit type</option>
+                        <option value="residential">Residential Site Visit</option>
+                        <option value="engineer">Engineer Visit</option>
+                        <option value="dealer">Dealer/Retailer Visit</option>
+                        <option value="contractor">Contractor/Mason Visit</option>
+                    </select>
+                </div>
+                
+                <!-- Address field with map preview -->
+                <div class="form-group">
+                    <label for="address"><i class="fas fa-map-marker-alt"></i> Site Address</label>
+                    <textarea id="address" placeholder="Enter full site address including city and state" required></textarea>
+                    
+                    <div class="map-container">
+                        <div id="map"></div>
+                        <div class="map-placeholder" id="mapPlaceholder">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <div>Map preview will appear after submitting</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dynamic fields will be inserted here -->
+                <div id="dynamicFieldsContainer"></div>
+                
+                <div class="error-message" id="errorMessage">
+                    <i class="fas fa-exclamation-circle"></i> <span id="errorText"></span>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-save" id="saveBtn">
+                        <i class="fas fa-save"></i> save to report
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Modal -->
+        <div class="modal" id="successModal">
+            <div class="modal-content">
+                <span class="close-modal" id="closeModal">&times;</span>
+                
+                <div class="modal-header">
+                    <div class="success-check">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h3>Report Submitted Successfully!</h3>
+                    <p>Your field visit report has been saved to our database</p>
+                </div>
+                
+                <div class="whatsapp-preview" id="whatsappPreviewModal"></div>
+                
+                <div style="display: flex; justify-content: center; margin-top: 30px;">
+                    <button class="btn btn-save" id="modalWhatsappBtn" style="background: linear-gradient(135deg, #25D366, #128C7E);">
+                        <i class="fab fa-whatsapp"></i> SEND VIA WHATSAPP
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 RHK UNIQUE Group. Premium Construction Solutions</p>
+            <p>Delivering Excellence Since 1985 </p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const visitType = document.getElementById('visitType');
+            const dynamicContainer = document.getElementById('dynamicFieldsContainer');
+            const saveBtn = document.getElementById('saveBtn');
+            const whatsappNumber = document.getElementById('whatsappNumber');
+            const addressField = document.getElementById('address');
+            const successModal = document.getElementById('successModal');
+            const closeModal = document.getElementById('closeModal');
+            const modalWhatsappBtn = document.getElementById('modalWhatsappBtn');
+            const whatsappPreviewModal = document.getElementById('whatsappPreviewModal');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const mapElement = document.getElementById('map');
+            const mapPlaceholder = document.getElementById('mapPlaceholder');
+            
+            // Google Apps Script Web App URL
+            const webAppUrl = 'https://script.google.com/macros/s/AKfycbxBGdZ3_QeZSrV3HIr_1pi9E5Z2c7F9Aev1_Kvjv61XkGRiy71NhoOwUNFCfVNxESo/exec';
+            
+            // Visit type field configurations
+            const fieldConfig = {
+                residential: [
+                    { type: 'text', id: 'ihb', label: 'IHB', placeholder: 'Enter IHB' },
+                    { type: 'tel', id: 'mob', label: 'MOB', placeholder: 'Mobile number' },
+                    { type: 'text', id: 'area', label: 'AREA', placeholder: 'Area name' },
+                    { type: 'text', id: 'contractorName', label: 'CONTRACTOR', placeholder: 'Contractor name' },
+                    { type: 'tel', id: 'contractorMob', label: 'CONTRACTOR MOB', placeholder: 'Contractor mobile' },
+                    { type: 'text', id: 'brand', label: 'BRAND', placeholder: 'Cement brand used' },
+                    { type: 'text', id: 'stage', label: 'STAGE', placeholder: 'Construction stage' }
+                ],
+                engineer: [
+                    { type: 'text', id: 'engineerName', label: 'NAME (Er.)', placeholder: 'Engineer name' },
+                    { type: 'tel', id: 'mob', label: 'MOB', placeholder: 'Mobile number' },
+                    { type: 'text', id: 'at', label: 'AT', placeholder: 'Location/Company' },
+                    { type: 'text', id: 'sites', label: 'SITES', placeholder: 'Sites handled' }
+                ],
+                dealer: [
+                    { type: 'text', id: 'counterName', label: 'Counter Name', placeholder: 'Shop name' },
+                    { type: 'text', id: 'pName', label: 'P.NAME', placeholder: 'Person name' },
+                    { type: 'tel', id: 'mob', label: 'MOB', placeholder: 'Mobile number' },
+                    { type: 'text', id: 'brand', label: 'BRAND', placeholder: 'Brands available' },
+                    { type: 'text', id: 'potential', label: 'POTENTIAL', placeholder: 'Potential for our brand' }
+                ],
+                contractor: [
+                    { type: 'text', id: 'contractorName', label: 'NAME', placeholder: 'Contractor name' },
+                    { type: 'tel', id: 'mob', label: 'MOB', placeholder: 'Mobile number' },
+                    { type: 'text', id: 'brand', label: 'BRAND', placeholder: 'Preferred brand' },
+                    { type: 'text', id: 'sites', label: 'SITES', placeholder: 'Current sites' }
+                ]
+            };
+            
+            // Initialize Leaflet map
+            let map;
+            let marker;
+            
+            function initMap() {
+                map = L.map('map', {
+                    zoomControl: false,
+                    attributionControl: false
+                }).setView([20.5937, 78.9629], 5); // Default to India view
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                }).addTo(map);
+                
+                // Add a default marker
+                marker = L.marker([20.5937, 78.9629], {
+                    draggable: false
+                }).addTo(map);
+                
+                // Hide the map initially, show placeholder
+                mapElement.style.display = 'none';
+                mapPlaceholder.style.display = 'flex';
+            }
+            
+            // Initialize the map when page loads
+            initMap();
+            
+            // Generate dynamic fields based on selection
+            visitType.addEventListener('change', function() {
+                const selectedType = this.value;
+                let fieldsHTML = '';
+                
+                if (selectedType && fieldConfig[selectedType]) {
+                    fieldsHTML = '<div class="dynamic-fields">';
+                    fieldConfig[selectedType].forEach(field => {
+                        fieldsHTML += `
+                            <div class="dynamic-row">
+                                <div class="dynamic-col">
+                                    <div class="form-group">
+                                        <label for="${field.id}">${field.label}</label>
+                                        <input type="${field.type}" id="${field.id}" placeholder="${field.placeholder}" required>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    fieldsHTML += '</div>';
+                }
+                
+                dynamicContainer.innerHTML = fieldsHTML;
+                hideError();
+            });
+            
+            // Function to update map based on address
+            function updateMapWithAddress(address) {
+                if (!address) return;
+                
+                showLoading(true);
+                
+                // Use Nominatim for geocoding (OpenStreetMap)
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const lat = parseFloat(data[0].lat);
+                            const lon = parseFloat(data[0].lon);
+                            
+                            // Update map view
+                            map.setView([lat, lon], 15);
+                            
+                            // Update marker position
+                            marker.setLatLng([lat, lon]);
+                            
+                            // Show the map and hide placeholder
+                            mapElement.style.display = 'block';
+                            mapPlaceholder.style.display = 'none';
+                        } else {
+                            // If no results found, show error
+                            mapPlaceholder.innerHTML = '<i class="fas fa-map-marked-alt"></i><div>Could not locate address</div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Geocoding error:', error);
+                        mapPlaceholder.innerHTML = '<i class="fas fa-exclamation-triangle"></i><div>Error loading map</div>';
+                    })
+                    .finally(() => {
+                        showLoading(false);
+                    });
+            }
+            
+            // Save to Google Sheets
+            saveBtn.addEventListener('click', async function() {
+                const selectedType = visitType.value;
+                if (!selectedType) {
+                    showError('Please select a visit type first');
+                    return;
+                }
+                
+                if (!whatsappNumber.value) {
+                    showError('Please enter a WhatsApp number');
+                    return;
+                }
+                
+                if (!addressField.value) {
+                    showError('Please enter the site address');
+                    return;
+                }
+                
+                // Validate all required fields
+                let isValid = true;
+                fieldConfig[selectedType].forEach(field => {
+                    const fieldElement = document.getElementById(field.id);
+                    if (fieldElement && !fieldElement.value) {
+                        isValid = false;
+                        fieldElement.focus();
+                        showError(`Please fill in the ${field.label} field`);
+                    }
+                });
+                
+                if (!isValid) return;
+                
+                // Update map preview with the entered address
+                updateMapWithAddress(addressField.value);
+                
+                // Collect all form data
+                const formData = {
+                    timestamp: new Date().toISOString(),
+                    whatsappNumber: whatsappNumber.value,
+                    visitType: selectedType,
+                    address: addressField.value
+                };
+                
+                // Add dynamic fields data
+                fieldConfig[selectedType].forEach(field => {
+                    const fieldElement = document.getElementById(field.id);
+                    if (fieldElement) {
+                        formData[field.id] = fieldElement.value;
+                    }
+                });
+                
+                try {
+                    // Show loading state
+                    showLoading(true);
+                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SAVING...';
+                    saveBtn.disabled = true;
+                    
+                    // Send data to Google Sheets
+                    const response = await fetch(webAppUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    // Check if the response is okay
+                    if (response.ok) {
+                        // Generate WhatsApp message preview
+                        let whatsappMessage = generateWhatsAppMessage(selectedType, formData);
+                        
+                        // Show success modal with preview
+                        whatsappPreviewModal.textContent = whatsappMessage;
+                        successModal.style.display = 'flex';
+                        hideError();
+                        
+                        // Set up modal WhatsApp button
+                        modalWhatsappBtn.onclick = function() {
+                            const url = `https://wa.me/${formData.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+                            window.open(url, '_blank');
+                        };
+                    } else {
+                        const errorText = await response.text();
+                        throw new Error(errorText || 'Failed to save data');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError('Error saving report: ' + (error.message || 'Please check your internet connection and try again'));
+                    
+                    // Additional troubleshooting help
+                    if (error.message.includes('Failed to fetch')) {
+                        showError('Could not connect to the server. Possible issues:<br>' +
+                                 '1. You might be offline<br>' +
+                                 '2. The server might be down<br>' +
+                                 '3. There might be a CORS issue<br>' +
+                                 'Please try again later or contact support.');
+                    }
+                } finally {
+                    // Reset button state
+                    showLoading(false);
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> SAVE TO DATABASE';
+                    saveBtn.disabled = false;
+                }
+            });
+            
+            // Helper function to generate WhatsApp message
+            function generateWhatsAppMessage(selectedType, formData) {
+                let message = '';
+                
+                switch(selectedType) {
+                    case 'residential':
+                        message = `*NEW SITE VISIT*\n\n` +
+                               `🏠 IHB: ${formData.ihb}\n` +
+                               `📞 MOB: ${formData.mob}\n` +
+                               `📍 AREA: ${formData.area}\n` +
+                               `👷 CONTRACTOR: ${formData.contractorName}\n` +
+                               `📱 CONTRACTOR MOB: ${formData.contractorMob}\n` +
+                               `🏗️ BRAND: ${formData.brand}\n` +
+                               `🔨 STAGE: ${formData.stage}\n`;
+                        break;
+                                
+                    case 'engineer':
+                        message = `*ENGINEER VISIT*\n\n` +
+                               `👨‍💼 ENGINEER: Er. ${formData.engineerName}\n` +
+                               `📞 MOB: ${formData.mob}\n` +
+                               `🏢 AT: ${formData.at}\n` +
+                               `🏗️ SITES: ${formData.sites}\n`;
+                        break;
+                                
+                    case 'dealer':
+                        message = `*COUNTER VISIT*\n\n` +
+                               `🏬 COUNTER: ${formData.counterName}\n` +
+                               `👤 PERSON: ${formData.pName}\n` +
+                               `📞 MOB: ${formData.mob}\n` +
+                               `🏷️ BRAND: ${formData.brand}\n` +
+                               `📈 POTENTIAL: ${formData.potential}\n`;
+                        break;
+                                
+                    case 'contractor':
+                        message = `*CONTRACTOR VISIT*\n\n` +
+                               `📱 WhatsApp: ${formData.whatsappNumber}\n` +
+                               `👷 CONTRACTOR: ${formData.contractorName}\n` +
+                               `📞 MOB: ${formData.mob}\n` +
+                               `🏷️ BRAND: ${formData.brand}\n` +
+                               `🏗️ SITES: ${formData.sites}\n`;
+                        break;
+                    default:
+                        return '';
+                }
+                
+                return message;
+            }
+            
+            // Helper functions for loading and error states
+            function showLoading(show) {
+                loadingOverlay.style.display = show ? 'flex' : 'none';
+            }
+            
+            function showError(message) {
+                errorMessage.style.display = 'block';
+                errorText.innerHTML = message;
+            }
+            
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
+            
+            // Close modal
+            closeModal.addEventListener('click', function() {
+                successModal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === successModal) {
+                    successModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
